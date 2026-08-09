@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+env/
+venv/
+mysql_data/
+media/music/*
+!.gitkeep
+*.db
+*.sqlite3
+.DS_Store

@@ -1,0 +1,50 @@
+
+services: 
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mast_maggan_web
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE-URL=mysql+pymysql://root:rootpassword@db:3306/mastmaggan_db
+    volumes:
+      - ./media:/app/media
+    networks:
+      - mast_maggan_network
+    depends_on:
+      db:
+        condition: service_healthy
+
+
+
+  db:
+    image: mysql:8.0
+    container_name: mast_maggan_db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: mastmaggan_db 
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql    
+    networks: 
+      - mast_maggan_network
+    healthcheck:
+      test: ["CMD", "mysqladmin","ping","-h","localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 60s 
+
+
+
+volumes: 
+  mysql_data:
+    
+    
+networks:    
+  mast_maggan_network:
+    driver: bridge
+  

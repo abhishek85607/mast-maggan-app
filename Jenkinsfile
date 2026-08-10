@@ -53,7 +53,7 @@ pipeline {
         }
         failure {
             echo 'Pipeline Failed! Sending failure email alert...'
-            mail to: "${env.ALERT_EMAIL}",
+            mail to: "realaviilife@gmail.com",
                  subject: "FAILED: Job '${env.JOB_NAME}' [Build #${env.BUILD_NUMBER}]",
                  body: """
                     ALERT: Jenkins Pipeline Deployment Failed!

@@ -18,7 +18,7 @@ pipeline {
         stage('2. Trivy Filesystem Scan') {
             steps {
                 echo 'Running Trivy Vulnerability Scan on Source Code...'
-                bat 'docker run --rm -v //./pipe/docker_engine://./pipe/docker_engine aquasec/trivy:latest fs --severity CRITICAL,HIGH .'
+                bat 'docker run --rm -v //./pipe/docker_engine://./pipe/docker_engine aquasec/trivy:latest fs --timeout 15m --severity CRITICAL,HIGH .'
             }
         }
 
@@ -41,8 +41,9 @@ pipeline {
                 echo 'Deploying FastAPI + MySQL with Docker Compose...'
                 bat 'docker compose up -d'
             }
-        }
+ 	}
     }
+
 
     post {
         always {
@@ -52,18 +53,18 @@ pipeline {
             echo 'Deployment Successful! App is Live.'
         }
         failure {
-            echo 'Pipeline Failed! Sending failure email alert...'
-            mail to: "realaviilife@gmail.com",
-                 subject: "FAILED: Job '${env.JOB_NAME}' [Build #${env.BUILD_NUMBER}]",
-                 body: """
-                    ALERT: Jenkins Pipeline Deployment Failed!
-
-                    Project: ${env.JOB_NAME}
-                    Build Number: #${env.BUILD_NUMBER}
-                    Build URL: ${env.BUILD_URL}
-
-                    Please check the Jenkins console logs to resolve the issue.
-                 """
+            echo 'Pipeline Failed! Attempting to send notification...'
+            script {
+                try {
+                    mail to: "realaviilife@gmail.com",
+                         subject: "FAILED: Job '${env.JOB_NAME}' [Build #${env.BUILD_NUMBER}]",
+                         body: "Pipeline failed. Check Jenkins logs: ${env.BUILD_URL}"
+                } catch (Exception e) {
+                    echo "Email alert skipped: ${e.getMessage()}"
+                }
+            }
         }
     }
-}
+}	
+
+    

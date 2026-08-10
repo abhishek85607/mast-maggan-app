@@ -21,7 +21,7 @@ pipeline {
 			sh 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest fs --severity CRITICAL,HIGH .'
 		}
 	}
-	stage(3. build docker image')
+	stage('3. build docker image')
 		steps {
 			echo 'building application docker image'
 			sh 'docker compose build --no-cache'

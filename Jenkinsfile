@@ -19,7 +19,7 @@ pipeline {
             steps {
                 echo 'Running Trivy Vulnerability Scan on Source Code...'
                 bat 'docker run --rm -v //./pipe/docker_engine://./pipe/docker_engine aquasec/trivy:latest fs --timeout 15m --severity CRITICAL,HIGH . & exit 0'
-            }
+            
             }
         }
 

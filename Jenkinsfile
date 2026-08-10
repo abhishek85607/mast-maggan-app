@@ -45,7 +45,7 @@ post {
 		echo 'Pipeline Execution completed'
 	}
 	success {
-		echo 'Deployment Successful! 
+		echo 'Deployment Successful!' 
 	}
 	failure {
 		echo 'pipeline failed! sending failure email alert'

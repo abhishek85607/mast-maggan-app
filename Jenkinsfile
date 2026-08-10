@@ -3,8 +3,8 @@ pipeline {
 
     environment {
         APP_NAME = 'mast-maggan-app'
-        DOCKER_IMAGE = 'mast-maggan-app-web:latest'
-	ALERT_EMAIL = 'realaviilife@gmail.com'
+        DOCKER_IMAGE = 'mast-maggan-devsecops-pipeline-web:latest'
+        ALERT_EMAIL = 'realaviilife@gmail.com'
     }
 
     stages {
@@ -32,7 +32,7 @@ pipeline {
         stage('4. Trivy Container Image Scan') {
             steps {
                 echo 'Running Trivy Scan on Built Docker Image...'
-                bat 'docker run --rm -v //./pipe/docker_engine://./pipe/docker_engine aquasec/trivy:latest image --severity CRITICAL,HIGH mast-maggan-devsecops-pipeline-web:latest'
+                bat 'docker run --rm -e TRIVY_DOCKER_HOST=unix:///var/run/docker.sock -v //./pipe/docker_engine:/var/run/docker.sock aquasec/trivy:latest image --severity CRITICAL,HIGH mast-maggan-devsecops-pipeline-web:latest'
             }
         }
 
@@ -52,8 +52,8 @@ pipeline {
             echo 'Deployment Successful! App is Live.'
         }
         failure {
-            echo 'Pipeline Failed! Check console logs.'
-	    mail to: "${env.ALERT_EMAIL}",
+            echo 'Pipeline Failed! Sending failure email alert...'
+            mail to: "${env.ALERT_EMAIL}",
                  subject: "FAILED: Job '${env.JOB_NAME}' [Build #${env.BUILD_NUMBER}]",
                  body: """
                     ALERT: Jenkins Pipeline Deployment Failed!
@@ -63,7 +63,7 @@ pipeline {
                     Build URL: ${env.BUILD_URL}
 
                     Please check the Jenkins console logs to resolve the issue.
-                 """	
+                 """
         }
     }
 }

@@ -18,7 +18,8 @@ pipeline {
         stage('2. Trivy Filesystem Scan') {
             steps {
                 echo 'Running Trivy Vulnerability Scan on Source Code...'
-                bat 'docker run --rm -v //./pipe/docker_engine://./pipe/docker_engine aquasec/trivy:latest fs --timeout 15m --severity CRITICAL,HIGH . || echo "Trivy FS scan completed with warnings"'
+                bat 'docker run --rm -v //./pipe/docker_engine://./pipe/docker_engine aquasec/trivy:latest fs --timeout 15m --severity CRITICAL,HIGH . & exit 0'
+            }
             }
         }
 
@@ -32,8 +33,8 @@ pipeline {
         stage('4. Trivy Container Image Scan') {
             steps {
                 echo 'Running Trivy Scan on Built Docker Image...'
-                // Fixed: Explicit npipe mount syntax for Windows Docker Engine API
-                bat 'docker run --rm -v //./pipe/docker_engine://./pipe/docker_engine aquasec/trivy:latest image --timeout 15m --severity CRITICAL,HIGH mast-maggan-devsecops-pipeline-web:latest || echo "Trivy Image scan completed with warnings"'
+                bat 'docker run --rm -e TRIVY_DOCKER_HOST=unix:///var/run/docker.sock -v //./pipe/docker_engine:/var/run/docker.sock aquasec/trivy:latest image --timeout 15m --severity CRITICAL,HIGH mast-maggan-devsecops-pipeline-web:latest & exit 0'
+            
             }
         }
 

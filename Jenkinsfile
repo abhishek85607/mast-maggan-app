@@ -1,76 +1,70 @@
 pipeline {
-	agent any 
+    agent any
 
-	environment {
-		APP_NAME = 'mast-maggan-app'
-		DOCKER_IMAGE = 'mast-maggan-app-web:latest'
-		NOTIFICATION_EMAIL = 'realaviilife@gmail.com'
-	}
+    environment {
+        APP_NAME = 'mast-maggan-app'
+        DOCKER_IMAGE = 'mast-maggan-app-web:latest'
+        ALERT_EMAIL = 'realaviilife@gmail.com'
+    }
 
-	stages {
-		stage('1. SCM checkout' ) {
-		 steps {
-			echo 'pulling latest code from github.'
-			checkout scm
-		}
-	}
-	
-	stage('2. Trivy Filesystem scan') {
-		steps {
-			echo 'Trivy scan on the source code.'
-			sh 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest fs --severity CRITICAL,HIGH .'
-		}
-	}
-	stage('3. build docker image')
-		steps {
-			echo 'building application docker image'
-			sh 'docker compose build --no-cache'
-		}
-	}
-	stage('4. Trivy container image scan') {
-		steps {
-			echo 'Trivy scan on built docker image'
-			sh 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image --severity CRITICAL,HIGH mast-maggan-app-web:latest'
-		}
-	}
-	stage('5. deploy container stack') {
-		steps {
-			echo ' deploying FastAPI + MYSQL with docker compose'
-			sh 'docker compose up -d'
-		}
-	}
+    stages {
+        stage('1. SCM Checkout') {
+            steps {
+                echo 'Pulling latest code from GitHub...'
+                checkout scm
+            }
+        }
+
+        stage('2. Trivy Filesystem Scan') {
+            steps {
+                echo 'Running Trivy Vulnerability Scan on Source Code...'
+                sh 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest fs --severity CRITICAL,HIGH .'
+            }
+        }
+
+        stage('3. Build Docker Image') {
+            steps {
+                echo 'Building Application Docker Image...'
+                sh 'docker compose build --no-cache'
+            }
+        }
+
+        stage('4. Trivy Container Image Scan') {
+            steps {
+                echo 'Running Trivy Scan on Built Docker Image...'
+                sh 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image --severity CRITICAL,HIGH mast-maggan-app-web:latest'
+            }
+        }
+
+        stage('5. Deploy Container Stack') {
+            steps {
+                echo 'Deploying FastAPI + MySQL with Docker Compose...'
+                sh 'docker compose up -d'
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline Execution Completed.'
+        }
+        success {
+            echo 'Deployment Successful! App is Live.'
+        }
+        failure {
+            echo 'Pipeline Failed! Sending failure email alert...'
+            mail to: "${env.ALERT_EMAIL}",
+                 subject: "FAILED: Job '${env.JOB_NAME}' [Build #${env.BUILD_NUMBER}]",
+                 body: """
+                    ALERT: Jenkins Pipeline Deployment Failed!
+
+                    Project: ${env.JOB_NAME}
+                    Build Number: #${env.BUILD_NUMBER}
+                    Build URL: ${env.BUILD_URL}
+
+                    Please check the Jenkins console logs to resolve the issue.
+                 """
+        }
+    }
 }
-post {
-	always {
-		echo 'Pipeline Execution completed'
-	}
-	success {
-		echo 'Deployment Successful!' 
-	}
-	failure {
-		echo 'pipeline failed! sending failure email alert'
-		mail to: "${env.NOTIFICATION_EMAIL}",
-		     subject: "FAILED: job '${env.JOB_NAME}' [Build #${env.BUILD_NUMBER}]",
-		     body: """
-			ALERT: jenkins pipeline deployment failed! 
-			
-
-			Project: ${env.JOB_NAME}
-			Build Number: #${env.BUILD_NUMBER}
-			Build URL: ${env.BUILD_URL}
-			
-
-			please check the jenkins console logs to reslove the issue. 
-            	    """
-		}
-	}
-	
-
-
-
-
-
-
-
-
 

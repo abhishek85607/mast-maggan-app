@@ -18,28 +18,28 @@ pipeline {
         stage('2. Trivy Filesystem Scan') {
             steps {
                 echo 'Running Trivy Vulnerability Scan on Source Code...'
-                sh 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest fs --severity CRITICAL,HIGH .'
+                bat 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest fs --severity CRITICAL,HIGH .'
             }
         }
 
         stage('3. Build Docker Image') {
             steps {
                 echo 'Building Application Docker Image...'
-                sh 'docker compose build --no-cache'
+                bat 'docker compose build --no-cache'
             }
         }
 
         stage('4. Trivy Container Image Scan') {
             steps {
                 echo 'Running Trivy Scan on Built Docker Image...'
-                sh 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image --severity CRITICAL,HIGH mast-maggan-app-web:latest'
+                bat 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image --severity CRITICAL,HIGH mast-maggan-app-web:latest'
             }
         }
 
         stage('5. Deploy Container Stack') {
             steps {
                 echo 'Deploying FastAPI + MySQL with Docker Compose...'
-                sh 'docker compose up -d'
+                bat 'docker compose up -d'
             }
         }
     }

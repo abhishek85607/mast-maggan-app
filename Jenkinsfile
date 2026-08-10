@@ -32,7 +32,7 @@ pipeline {
         stage('4. Trivy Container Image Scan') {
             steps {
                 echo 'Running Trivy Scan on Built Docker Image...'
-                bat 'docker run --rm -v //./pipe/docker_engine://./pipe/docker_engine aquasec/trivy:latest image --severity CRITICAL,HIGH mast-maggan-app-web:latest'
+                bat 'docker run --rm -v //./pipe/docker_engine://./pipe/docker_engine aquasec/trivy:latest image --severity CRITICAL,HIGH mast-maggan-devsecops-pipeline-web:latest'
             }
         }
 

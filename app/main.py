@@ -9,8 +9,9 @@ from sqlalchemy.orm import declarative_base, sessionmaker, Session
 
 app = FastAPI(title="Mast Maggan - Music Streaming Platform")
 
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
-templates = Jinja2Templates(directory="app/templates")
+static_dir = os.path.join(os.path.dirname(__file__), "static")
+if os.path.exists(static_dir):
+    app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 # Direct MySQL Connection for Docker Setup
 DATABASE_URL = os.getenv("DATABASE_URL", "mysql+pymysql://root:rootpassword@db:3306/mastmaggan_db")

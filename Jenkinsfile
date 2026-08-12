@@ -21,6 +21,12 @@ pipeline {
                 bat 'docker run --rm -v //./pipe/docker_engine://./pipe/docker_engine aquasec/trivy:latest fs --timeout 15m --severity CRITICAL,HIGH . & exit 0'
             }
         }
+	stage('3. SonarQube Analysis') {
+            steps {
+                echo 'Running SonarQube Code Quality & Security Scan...'
+                bat 'docker run --rm -v "%WORKSPACE%:/usr/src" sonarsource/sonar-scanner-cli -Dsonar.projectKey=mast-maggan-app -Dsonar.sources=. -Dsonar.host.url=http://<SONARQUBE_IP>:9000 -Dsonar.login=<SONAR_TOKEN>'
+            }
+        }
 
         stage('3. Build Docker Image') {
             steps {

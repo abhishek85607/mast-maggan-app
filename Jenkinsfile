@@ -28,21 +28,21 @@ pipeline {
             }
         }
 
-        stage('3. Build Docker Image') {
+        stage('4. Build Docker Image') {
             steps {
                 echo 'Building Application Docker Image...'
                 bat 'docker compose build --no-cache'
             }
         }
 
-        stage('4. Trivy Container Image Scan') {
+        stage('5. Trivy Container Image Scan') {
             steps {
                 echo 'Running Trivy Scan on Built Docker Image...'
                 bat 'docker run --rm -e TRIVY_DOCKER_HOST=unix:///var/run/docker.sock -v //./pipe/docker_engine:/var/run/docker.sock aquasec/trivy:latest image --timeout 15m --severity CRITICAL,HIGH mast-maggan-devsecops-pipeline-web:latest & exit 0'
             }
         }
 
-        stage('5. Deploy Container Stack') {
+        stage('6. Deploy Container Stack') {
             steps {
                 echo 'Deploying FastAPI + MySQL with Docker Compose...'
                 bat 'docker compose up -d'

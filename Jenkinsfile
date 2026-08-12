@@ -47,22 +47,30 @@ pipeline {
     }
 
     post {
-        always {
-            echo 'Pipeline Execution Completed.'
+    always {
+        echo 'Pipeline Execution Completed.'
+    }
+    success {
+        echo 'Deployment Successful! App is Live.'
+        script {
+            try {
+                mail to: "realaviilife@gmail.com",
+                     subject: "SUCCESS: Job '${env.JOB_NAME}' [Build #${env.BUILD_NUMBER}]",
+                     body: "Awesome! Your pipeline completed successfully and app is live! Build URL: ${env.BUILD_URL}"
+            } catch (Exception e) {
+                echo "Email alert skipped: ${e.getMessage()}"
+            }
         }
-        success {
-            echo 'Deployment Successful! App is Live.'
-        }
-        failure {
-            echo 'Pipeline Failed! Attempting to send notification...'
-            script {
-                try {
-                    mail to: "realaviilife@gmail.com",
-                         subject: "FAILED: Job '${env.JOB_NAME}' [Build #${env.BUILD_NUMBER}]",
-                         body: "Pipeline failed. Check Jenkins logs: ${env.BUILD_URL}"
-                } catch (Exception e) {
-                    echo "Email alert skipped: ${e.getMessage()}"
-                }
+    }
+    failure {
+        echo 'Pipeline Failed! Check console logs.'
+        script {
+            try {
+                mail to: "realaviilife@gmail.com",
+                     subject: "FAILED: Job '${env.JOB_NAME}' [Build #${env.BUILD_NUMBER}]",
+                     body: "Pipeline failed. Check Jenkins logs: ${env.BUILD_URL}"
+            } catch (Exception e) {
+                echo "Email alert skipped: ${e.getMessage()}"
             }
         }
     }

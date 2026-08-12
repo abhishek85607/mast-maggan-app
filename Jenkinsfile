@@ -19,7 +19,6 @@ pipeline {
             steps {
                 echo 'Running Trivy Vulnerability Scan on Source Code...'
                 bat 'docker run --rm -v //./pipe/docker_engine://./pipe/docker_engine aquasec/trivy:latest fs --timeout 15m --severity CRITICAL,HIGH . & exit 0'
-            
             }
         }
 
@@ -34,7 +33,6 @@ pipeline {
             steps {
                 echo 'Running Trivy Scan on Built Docker Image...'
                 bat 'docker run --rm -e TRIVY_DOCKER_HOST=unix:///var/run/docker.sock -v //./pipe/docker_engine:/var/run/docker.sock aquasec/trivy:latest image --timeout 15m --severity CRITICAL,HIGH mast-maggan-devsecops-pipeline-web:latest & exit 0'
-            
             }
         }
 
@@ -47,30 +45,31 @@ pipeline {
     }
 
     post {
-    always {
-        echo 'Pipeline Execution Completed.'
-    }
-    success {
-        echo 'Deployment Successful! App is Live.'
-        script {
-            try {
-                mail to: "realaviilife@gmail.com",
-                     subject: "SUCCESS: Job '${env.JOB_NAME}' [Build #${env.BUILD_NUMBER}]",
-                     body: "Awesome! Your pipeline completed successfully and app is live! Build URL: ${env.BUILD_URL}"
-            } catch (Exception e) {
-                echo "Email alert skipped: ${e.getMessage()}"
+        always {
+            echo 'Pipeline Execution Completed.'
+        }
+        success {
+            echo 'Deployment Successful! App is Live.'
+            script {
+                try {
+                    mail to: "realaviilife@gmail.com",
+                         subject: "SUCCESS: Job '${env.JOB_NAME}' [Build #${env.BUILD_NUMBER}]",
+                         body: "Awesome! Your pipeline completed successfully and app is live! Build URL: ${env.BUILD_URL}"
+                } catch (Exception e) {
+                    echo "Email alert skipped: ${e.getMessage()}"
+                }
             }
         }
-    }
-    failure {
-        echo 'Pipeline Failed! Check console logs.'
-        script {
-            try {
-                mail to: "realaviilife@gmail.com",
-                     subject: "FAILED: Job '${env.JOB_NAME}' [Build #${env.BUILD_NUMBER}]",
-                     body: "Pipeline failed. Check Jenkins logs: ${env.BUILD_URL}"
-            } catch (Exception e) {
-                echo "Email alert skipped: ${e.getMessage()}"
+        failure {
+            echo 'Pipeline Failed! Check console logs.'
+            script {
+                try {
+                    mail to: "realaviilife@gmail.com",
+                         subject: "FAILED: Job '${env.JOB_NAME}' [Build #${env.BUILD_NUMBER}]",
+                         body: "Pipeline failed. Check Jenkins logs: ${env.BUILD_URL}"
+                } catch (Exception e) {
+                    echo "Email alert skipped: ${e.getMessage()}"
+                }
             }
         }
     }

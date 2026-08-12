@@ -5,10 +5,11 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: mast_maggan_web
+    restart: always 
     ports:
       - "8000:8000"
     environment:
-      - DATABASE-URL=mysql+pymysql://root:rootpassword@db:3306/mastmaggan_db
+      - DATABASE_URL=mysql+pymysql://root:rootpassword@db:3306/mastmaggan_db
     volumes:
       - ./media:/app/media
     networks:
@@ -22,6 +23,7 @@ services:
   db:
     image: mysql:8.0
     container_name: mast_maggan_db
+    restart: always 
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: mastmaggan_db 

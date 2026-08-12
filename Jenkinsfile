@@ -5,7 +5,7 @@ pipeline {
         APP_NAME = 'mast-maggan-app'
         DOCKER_IMAGE = 'mast-maggan-devsecops-pipeline-web:latest'
         ALERT_EMAIL = 'realaviilife@gmail.com'
-	SONAR_HOST_URL = 'http://host.docker.internal:9000'
+	SONAR_HOST_URL = 'http://10.242.21.97:9000'
 	SONAR_TOKEN = 'sqa_8fd383c87364feac0d834a34f936cc64daf9f79d'
     }
 

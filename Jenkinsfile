@@ -5,6 +5,8 @@ pipeline {
         APP_NAME = 'mast-maggan-app'
         DOCKER_IMAGE = 'mast-maggan-devsecops-pipeline-web:latest'
         ALERT_EMAIL = 'realaviilife@gmail.com'
+	SONAR_HOST_URL = 'http://host.docker.internal:9000'
+	SONAR_TOKEN = 'sqa_8fd383c87364feac0d834a34f936cc64daf9f79d'
     }
 
     stages {
@@ -24,7 +26,15 @@ pipeline {
 	stage('3. SonarQube Analysis') {
             steps {
                 echo 'Running SonarQube Code Quality & Security Scan...'
-                bat 'docker run --rm -v "%WORKSPACE%:/usr/src" sonarsource/sonar-scanner-cli -Dsonar.projectKey=mast-maggan-app -Dsonar.sources=. -Dsonar.host.url=http://<SONARQUBE_IP>:9000 -Dsonar.login=<SONAR_TOKEN>'
+                bat """
+                    docker run --rm ^
+                      -v "%WORKSPACE%:/usr/src" ^
+                      sonarsource/sonar-scanner-cli ^
+                      -Dsonar.projectKey=mast-maggan-app ^
+                      -Dsonar.sources=. ^
+                      -Dsonar.host.url=%SONAR_HOST_URL% ^
+                      -Dsonar.token=%SONAR_TOKEN%
+                """
             }
         }
 

@@ -9,9 +9,23 @@ from sqlalchemy.orm import declarative_base, sessionmaker, Session
 
 app = FastAPI(title="Mast Maggan - Music Streaming Platform")
 
+
+#Templates directory
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
+
+
+#static files mounting
 static_dir = os.path.join(os.path.dirname(__file__), "static")
 if os.path.exists(static_dir):
     app.mount("/static", StaticFiles(directory=static_dir), name="static")
+
+
+# Root Endpoint
+@app.get("/")
+def read_root(request: Request):
+    songs = []  # ya jo bhi aapka database query logic hai
+    return templates.TemplateResponse("index.html", {"request": request, "songs": songs})
 
 # Direct MySQL Connection for Docker Setup
 DATABASE_URL = os.getenv("DATABASE_URL", "mysql+pymysql://root:rootpassword@db:3306/mastmaggan_db")

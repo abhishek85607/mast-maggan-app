@@ -59,6 +59,13 @@ pipeline {
                 bat 'docker compose up -d'
             }
         }
+	stage('7. Deploy to Kubernetes Cluster') {
+            steps {
+                echo 'Applying Kubernetes Manifests and Restarting Deployment...'
+                bat 'kubectl apply -f k8s/'
+                bat 'kubectl rollout restart deployment mast-maggan-app'
+            }
+        }
     }
 
     post {

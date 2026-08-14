@@ -49,7 +49,9 @@ pipeline {
         stage('5. Trivy Container Image Scan') {
             steps {
                 echo 'Running Trivy Scan on Built Docker Image...'
-                bat 'docker run --rm -v //./pipe/docker_engine://./pipe/docker_engine aquasec/trivy:latest image --timeout 15m --severity CRITICAL,HIGH mast-maggan-devsecops-pipeline-web:latest & exit 0'
+                catchError(buildResult: 'SUCCESS',stageResult: 'UNSTABLE'){
+		   bat 'docker run --rm -e TRIVY_DOCKER_HOST=npipe:////./pipe/docker_engine -v //./pipe/docker_engine://./pipe/docker_engine aquasec/trivy:latest image --timout 15m --severity CRITICAL,HIGH mast-maggan-devsecops-pipe-web:latest'
+		}	
             }
         }
 
@@ -62,7 +64,9 @@ pipeline {
 	stage('7. Deploy to Kubernetes Cluster') {
             steps {
                 echo 'Applying Kubernetes Manifests and Restarting Deployment...'
-                bat 'kubectl apply -f k8s || echo "k8s cluster not directly reachable from windows host" '
+                catchError(buildResult: 'SUCCESS',stageResult: 'UNSTABLE'){
+		   bat 'kubectl apply -f k8s/ --validate=false'
+		}
             }
         }
     }

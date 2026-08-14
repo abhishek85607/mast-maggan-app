@@ -20,7 +20,7 @@ pipeline {
         stage('2. Trivy Filesystem Scan') {
             steps {
                 echo 'Running Trivy Vulnerability Scan on Source Code...'
-                bat 'docker run --rm -v //./pipe/docker_engine://./pipe/docker_engine aquasec/trivy:latest fs --skip-db-update --timeout 15m --severity CRITICAL,HIGH . & exit 0'
+                bat 'docker run --rm -v trivy-cache:/root/.cache/ -v //./pipe/docker_engine://./pipe/docker_engine aquasec/trivy:latest fs --skip-db-update --timeout 15m --severity CRITICAL,HIGH . & exit 0'
             }
         }
 
@@ -51,7 +51,7 @@ pipeline {
             steps {
                 echo 'Running Trivy Scan on Built Docker Image...'
                 catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                    bat 'docker run --rm -v //./pipe/docker_engine://./pipe/docker_engine aquasec/trivy:latest image --skip-db-update --timeout 15m --severity CRITICAL,HIGH mast-maggan-devsecops-pipeline-web:latest'
+                    bat 'docker run --rm -v trivy-cache:/root/.cache/ -v //./pipe/docker_engine://./pipe/docker_engine aquasec/trivy:latest image --skip-db-update --timeout 15m --severity CRITICAL,HIGH mast-maggan-devsecops-pipeline-web:latest'
                 }
             }
         }

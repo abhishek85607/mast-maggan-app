@@ -42,51 +42,7 @@ pipeline {
         stage('4. Build Docker Image') {
             steps {
                 echo 'Building Application Docker Image...'
-pipeline {
-    agent any
-
-    environment {
-        APP_NAME = 'mast-maggan-app'
-        DOCKER_IMAGE = 'mast-maggan-devsecops-pipeline-web:latest'
-        ALERT_EMAIL = 'realaviilife@gmail.com'
-        SONAR_HOST_URL = 'http://10.242.21.42:9000'
-        SONAR_TOKEN = 'sqa_8fd383c87364feac0d834a34f936cc64daf9f79d'
-    }
-
-    stages {
-        stage('1. SCM Checkout') {
-            steps {
-                echo 'Pulling latest code from GitHub...'
-                checkout scm
-            }
-        }
-
-        stage('2. Trivy Filesystem Scan') {
-            steps {
-                echo 'Running Trivy Vulnerability Scan on Source Code...'
-                bat 'docker run --rm -v //./pipe/docker_engine://./pipe/docker_engine aquasec/trivy:latest fs --timeout 15m --severity CRITICAL,HIGH . & exit 0'
-            }
-        }
-        stage('3. SonarQube Analysis') {
-            steps {
-                echo 'Running SonarQube Code Quality & Security Scan...'
-                bat '''
-                    docker run --rm ^
-                      --add-host=host.docker.internal:host-gateway ^
-                      -v "%WORKSPACE%:/usr/src" ^
-                      sonarsource/sonar-scanner-cli ^
-                      -Dsonar.projectKey=mast-maggan-app ^
-                      -Dsonar.sources=. ^
-                      -Dsonar.host.url=%SONAR_HOST_URL% ^
-                      -Dsonar.token=%SONAR_TOKEN% || exit 0
-                '''
-            }
-        }
-
-        stage('4. Build Docker Image') {
-            steps {
-                echo 'Building Application Docker Image...'
-                bat 'docker compose build --no-cache'
+		bat 'docker compose build --no-cache'
             }
         }
 

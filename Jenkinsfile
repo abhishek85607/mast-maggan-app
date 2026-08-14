@@ -20,7 +20,7 @@ pipeline {
         stage('2. Trivy Filesystem Scan') {
             steps {
                 echo 'Running Trivy Vulnerability Scan on Source Code...'
-                bat 'docker run --rm -v //./pipe/docker_engine://./pipe/docker_engine aquasec/trivy:latest fs --timeout 15m --severity CRITICAL,HIGH . & exit 0'
+                bat 'docker run --rm -v //./pipe/docker_engine://./pipe/docker_engine aquasec/trivy:latest fs --skip-db-update --timeout 15m --severity CRITICAL,HIGH . & exit 0'
             }
         }
 
@@ -39,11 +39,11 @@ pipeline {
                 '''
             }
         }
-
+                            
         stage('4. Build Docker Image') {
             steps {
                 echo 'Building Application Docker Image...'
-                bat 'docker compose build --no-cache'
+                bat 'docker compose build'
             }
         }
 
@@ -51,7 +51,7 @@ pipeline {
             steps {
                 echo 'Running Trivy Scan on Built Docker Image...'
                 catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                    bat 'docker run --rm -v //./pipe/docker_engine://./pipe/docker_engine aquasec/trivy:latest image --timeout 15m --severity CRITICAL,HIGH mast-maggan-devsecops-pipeline-web:latest'
+                    bat 'docker run --rm -v //./pipe/docker_engine://./pipe/docker_engine aquasec/trivy:latest image --skip-db-update --timeout 15m --severity CRITICAL,HIGH mast-maggan-devsecops-pipeline-web:latest'
                 }
             }
         }
@@ -67,7 +67,7 @@ pipeline {
             steps {
                 echo 'Applying Kubernetes Manifests and Restarting Deployment...'
                 catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                    bat 'kubectl apply -f k8s/ --validate=false || exit 0'
+                    bat 'kubectl --kubeconfig="C:\\Users\\abhis\\.kube\\config" apply -f k8s/ --validate=false'
                 }
             }
         }

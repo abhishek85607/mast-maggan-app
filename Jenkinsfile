@@ -51,7 +51,11 @@ pipeline {
             steps {
                 echo 'Running Trivy Scan on Built Docker Image...'
                 catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                    bat 'docker run --rm -v trivy-cache:/root/.cache/ -v //./pipe/docker_engine:/var/run/docker.sock aquasec/trivy:latest image --timeout 15m --severity CRITICAL,HIGH mast-maggan-devsecops-pipeline-web:latest'
+                    bat '''
+                        docker save mast-maggan-devsecops-pipeline-web:latest -o "%WORKSPACE%\\image.tar"
+                        docker run --rm -v trivy-cache:/root/.cache/ -v "%WORKSPACE%:/workspace" aquasec/trivy:latest image --input /workspace/image.tar --severity CRITICAL,HIGH
+                        del "%WORKSPACE%\\image.tar"
+                    '''
                 }
             }
         }

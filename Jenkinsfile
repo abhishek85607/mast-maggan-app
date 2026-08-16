@@ -71,7 +71,10 @@ pipeline {
             steps {
                 echo 'Applying Kubernetes Manifests and Restarting Deployment...'
                 catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                    bat 'kubectl --kubeconfig="C:\\Users\\abhis\\.kube\\config" apply -f k8s/ --validate=false'
+                    bat '''
+                        kubectl --kubeconfig="C:\\Users\\abhis\\.kube\\config" apply -f k8s/ --validate=false
+                        kubectl --kubeconfig="C:\\Users\\abhis\\.kube\\config" rollout restart deployment/mast-maggan-app
+                    '''
                 }
             }
         }

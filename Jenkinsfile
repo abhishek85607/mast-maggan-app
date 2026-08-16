@@ -5,7 +5,7 @@ pipeline {
         APP_NAME = 'mast-maggan-app'
         DOCKER_IMAGE = 'mast-maggan-devsecops-pipeline-web:latest'
         ALERT_EMAIL = 'realaviilife@gmail.com'
-        SONAR_HOST_URL = 'http://10.242.21.42:9000'
+        SONAR_HOST_URL = 'http://10.112.217.42:9000'
         SONAR_TOKEN = 'sqa_8fd383c87364feac0d834a34f936cc64daf9f79d'
     }
 
@@ -51,7 +51,7 @@ pipeline {
             steps {
                 echo 'Running Trivy Scan on Built Docker Image...'
                 catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                    bat 'docker run --rm -v trivy-cache:/root/.cache/ -v //./pipe/docker_engine://./pipe/docker_engine aquasec/trivy:latest image --timeout 15m --severity CRITICAL,HIGH mast-maggan-devsecops-pipeline-web:latest'
+                    bat 'docker run --rm -v trivy-cache:/root/.cache/ -v //./pipe/docker_engine:/var/run/docker.sock aquasec/trivy:latest image --timeout 15m --severity CRITICAL,HIGH mast-maggan-devsecops-pipeline-web:latest'
                 }
             }
         }

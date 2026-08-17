@@ -16,21 +16,17 @@ templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
 
 
 #static files mounting
-static_dir = os.path.join(os.path.dirname(__file__), "static")
-if os.path.exists(static_dir):
-    app.mount("/static", StaticFiles(directory=static_dir), name="static")
+PROJECT_ROOT = os.path.dirname(BASE_DIR)
+if os.path.exists(os.path.join(PROJECT_ROOT, "static")):
+    app.mount("/static", StaticFiles(directory=os.path.join(PROJECT_ROOT, "static")), name="static")
+elif os.path.exists(os.path.join(BASE_DIR, "static")):
+    app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
 
-
-# Root Endpoint
-@app.get("/")
-def read_root(request: Request):
-    songs = []  # ya jo bhi aapka database query logic hai
-    return templates.TemplateResponse("index.html", {"request": request, "songs": songs})
 
 # Direct MySQL Connection for Docker Setup
 DATABASE_URL = os.getenv("DATABASE_URL", "mysql+pymysql://root:rootpassword@db:3306/mastmaggan_db")
 
-# SQLite aur MySQL dono ke engine creation fix
+# Fixing SQlite and MYSQL creation engine
 if DATABASE_URL.startswith("sqlite"):
     engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 else:

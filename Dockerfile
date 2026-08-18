@@ -15,7 +15,8 @@ FROM python:3.10-slim AS runner
 WORKDIR /app
 RUN useradd -m -u 1000 appuser
 COPY --from=builder /root/.local /home/appuser/.local  
-COPY --chown=appuser:appuser . .
+COPY --chown=appuser:appuser static/ /app/static/
+COPY --chown=appuser:appuser . /app/
 ENV PATH=/home/appuser/.local/bin:$PATH 
 ENV PYTHONUNBUFFERED=1
 

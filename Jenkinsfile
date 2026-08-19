@@ -30,7 +30,7 @@ pipeline {
         stage('3. SonarQube Analysis') {
             steps {
                 echo 'Running SonarQube Code Quality & Security Scan...'
-                bat 'docker run --rm --net=host -v "%WORKSPACE%:/usr/src" sonarsource/sonar-scanner-cli -Dsonar.projectKey=mast-maggan-app -Dsonar.sources=. -Dsonar.host.url=http://10.112.217.42:9000 -Dsonar.login=squ_0a9917f55e7b3712ec162c65e0bf1af00fd3d1ad'
+                bat 'docker run --rm --net=host -v "%WORKSPACE%:/usr/src" sonarsource/sonar-scanner-cli -Dsonar.projectKey=mast-maggan-app -Dsonar.sources=. -Dsonar.host.url=http://10.254.225.42:9000 -Dsonar.login=squ_0a9917f55e7b3712ec162c65e0bf1af00fd3d1ad'
             }
         }
 

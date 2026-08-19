@@ -59,14 +59,12 @@ pipeline {
             }
         }
 
-        stage('6. Transfer Image to Linux VM & Minikube') {
+        stage('6. Build Image on Linux VM') {
             steps {
-                echo 'Transferring Image to Linux VM and loading into Minikube...'
+                echo 'Pulling latest code and building image inside Linux VM Minikube...'
                 catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                    // Windows se VM par image transfer aur minikube me load
                     bat """
-                        curl -T "%WORKSPACE%\\image.tar" http://10.254.225.42:8000/upload_tmp 2>NUL || exit 0
-                        del "%WORKSPACE%\\image.tar"
+                        ssh -o StrictHostKeyChecking=no root@10.254.225.42 "cd /root/projects/mast-maggan-app && git pull origin main && eval \\\$(minikube docker-env) && docker build -t mast-maggan-app-web:latest . && eval \\\$(minikube docker-env -u)"
                     """
                 }
             }
@@ -74,13 +72,10 @@ pipeline {
 
         stage('7. Deploy to Kubernetes Cluster') {
             steps {
-                echo 'Deploying to Kubernetes Cluster...'
+                echo 'Applying K8s manifests and restarting deployment...'
                 catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                     bat """
-                        minikube image load mast-maggan-app-web:latest
-                        kubectl --kubeconfig="C:\\Users\\abhis\\.kube\\config" apply -f k8s/ --validate=false
-                        kubectl --kubeconfig="C:\\Users\\abhis\\.kube\\config" rollout restart deployment/mast-maggan-app
-                        kubectl --kubeconfig="C:\\Users\\abhis\\.kube\\config" rollout status deployment/mast-maggan-app --timeout=90s
+                        ssh -o StrictHostKeyChecking=no root@10.254.225.42 "kubectl apply -f /root/projects/mast-maggan-app/k8s/app-deployment.yaml && kubectl rollout restart deployment/mast-maggan-app && kubectl rollout status deployment/mast-maggan-app --timeout=60s"
                     """
                 }
             }

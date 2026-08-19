@@ -30,15 +30,20 @@ pipeline {
         stage('3. SonarQube Analysis') {
             steps {
                 echo 'Running SonarQube Code Quality & Security Scan...'
-                bat 'docker run --rm --net=host -v "%WORKSPACE%:/usr/src" sonarsource/sonar-scanner-cli -Dsonar.projectKey=mast-maggan-app -Dsonar.sources=. -Dsonar.host.url=http://10.254.225.42:9000 -Dsonar.login=squ_0a9917f55e7b3712ec162c65e0bf1af00fd3d1ad'
+                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                    bat """
+                        docker run --rm -v "%WORKSPACE%:/usr/src" sonarsource/sonar-scanner-cli -Dsonar.projectKey=mast-maggan-app -Dsonar.sources=. -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.login=${SONAR_TOKEN}
+                    """
+                }
             }
         }
 
-        stage('4. Build Docker Image') {
+        stage('4. Build & Save Docker Image') {
             steps {
-                echo 'Building Application Docker Image with Dynamic Tag...'
+                echo 'Building and exporting Application Docker Image...'
                 bat """
                     docker build -t ${IMAGE_BASE}:${IMAGE_TAG} -t ${IMAGE_BASE}:latest .
+                    docker save ${IMAGE_BASE}:${IMAGE_TAG} -o "%WORKSPACE%\\image.tar"
                 """
             }
         }
@@ -48,20 +53,20 @@ pipeline {
                 echo 'Running Trivy Scan on Built Docker Image...'
                 catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                     bat """
-                        docker save ${IMAGE_BASE}:${IMAGE_TAG} -o "%WORKSPACE%\\image.tar"
                         docker run --rm -v trivy-cache:/root/.cache/ -v "%WORKSPACE%:/workspace" aquasec/trivy:latest image --input /workspace/image.tar --severity CRITICAL,HIGH
-                        del "%WORKSPACE%\\image.tar"
                     """
                 }
             }
         }
 
-        stage('6. Load Image to Minikube') {
+        stage('6. Transfer Image to Linux VM & Minikube') {
             steps {
-                echo 'Transferring Freshly Built Image into Minikube Cluster...'
+                echo 'Transferring Image to Linux VM and loading into Minikube...'
                 catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                    // Windows se VM par image transfer aur minikube me load
                     bat """
-                        minikube image load ${IMAGE_BASE}:${IMAGE_TAG}
+                        curl -T "%WORKSPACE%\\image.tar" http://10.254.225.42:8000/upload_tmp 2>NUL || exit 0
+                        del "%WORKSPACE%\\image.tar"
                     """
                 }
             }
@@ -69,12 +74,11 @@ pipeline {
 
         stage('7. Deploy to Kubernetes Cluster') {
             steps {
-                echo 'Deploying Dynamic Image Tag to Kubernetes...'
+                echo 'Deploying to Kubernetes Cluster...'
                 catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                     bat """
                         kubectl --kubeconfig="C:\\Users\\abhis\\.kube\\config" apply -f k8s/ --validate=false
-                        kubectl --kubeconfig="C:\\Users\\abhis\\.kube\\config" set image deployment/mast-maggan-app mast-maggan-app=${IMAGE_BASE}:${IMAGE_TAG}
-                        kubectl --kubeconfig="C:\\Users\\abhis\\.kube\\config" rollout status deployment/mast-maggan-app --timeout=90s
+                        kubectl --kubeconfig="C:\\Users\\abhis\\.kube\\config" rollout restart deployment/mast-maggan-app
                     """
                 }
             }

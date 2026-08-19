@@ -17,12 +17,14 @@ spec:
       containers:
       - name: mast-maggan-app
         image: mast-maggan-app-web:latest
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Never
         ports:
         - containerPort: 8000
         env:
         - name: DATABASE_URL
           value: "mysql+pymysql://root:rootpassword@mysql-svc:3306/mastmaggan_db"
+        - name: AUDIO_DIR
+          value: "/app/static/audio"
         readinessProbe:
           httpGet:
             path: /health
@@ -35,10 +37,3 @@ spec:
             port: 8000
           initialDelaySeconds: 10
           periodSeconds: 10
-        resources:
-          requests:
-            memory: "128Mi"
-            cpu: "100m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"

@@ -18,9 +18,9 @@ COPY --from=builder /root/.local /home/appuser/.local
 
 COPY --chown=appuser:appuser . /app/
 
-RUN mkdir -p /tmp/audio && \
-    cp -r /app/static/audio/* /tmp/audio/ && \
-    chown -R appuser:appuser /tmp/audio /app
+RUN mkdir -p /app/static/audio /tmp/audio && \
+    cp -r /app/static/audio/* /tmp/audio/ 2>/dev/null || true && \
+    chown -R appuser:appuser /app /tmp/audio
 
 ENV PATH=/home/appuser/.local/bin:$PATH 
 ENV PYTHONUNBUFFERED=1

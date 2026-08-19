@@ -77,8 +77,10 @@ pipeline {
                 echo 'Deploying to Kubernetes Cluster...'
                 catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                     bat """
+                        minikube image load mast-maggan-app-web:latest
                         kubectl --kubeconfig="C:\\Users\\abhis\\.kube\\config" apply -f k8s/ --validate=false
                         kubectl --kubeconfig="C:\\Users\\abhis\\.kube\\config" rollout restart deployment/mast-maggan-app
+                        kubectl --kubeconfig="C:\\Users\\abhis\\.kube\\config" rollout status deployment/mast-maggan-app --timeout=90s
                     """
                 }
             }

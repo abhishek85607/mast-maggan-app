@@ -12,14 +12,16 @@ app = FastAPI(title="Mast Maggan - Music Streaming Platform")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(BASE_DIR)
 
+# Templates directory mapping
 templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
 
+# Database setup
 DATABASE_URL = os.getenv("DATABASE_URL", "mysql+pymysql://root:rootpassword@mysql-svc:3306/mastmaggan_db")
 
 if DATABASE_URL.startswith("sqlite"):
     engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 else:
-    engine = create_engine(DATABASE_URL)
+    engine = create_engine(DATABASE_URL, pool_pre_ping=True)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
@@ -40,6 +42,34 @@ def get_db():
     finally:
         db.close()
 
+# --- AUTO-SEED LOGIC ---
+@app.on_event("startup")
+def auto_seed_database():
+    """Server boot hote hi agar DB empty hai to saare 11 tracks add kar dega"""
+    db = SessionLocal()
+    try:
+        if db.query(Song).count() == 0:
+            initial_songs = [
+                Song(title="Abhishek Special Track", artist="Abhishek", file_path="abhishek.mp3"),
+                Song(title="Chiki Melody 1", artist="Chiki", file_path="chiki1.mp3"),
+                Song(title="Chiki Melody 2", artist="Chiki", file_path="chiki2.mp3"),
+                Song(title="Chiki Melody 3", artist="Chiki", file_path="chiki3.mp3"),
+                Song(title="Dinesh Grooves", artist="Dinesh", file_path="dinesh.mp3"),
+                Song(title="Kalyani Beats", artist="Kalyani", file_path="kalyani.mp3"),
+                Song(title="Lollipop Hit", artist="Pawan Singh", file_path="lollipop.mp3"),
+                Song(title="Prem Sagar Track 1", artist="Prem", file_path="prem1.mp3"),
+                Song(title="Prem Sagar Track 2", artist="Prem", file_path="prem2.mp3"),
+                Song(title="Prem Sagar Track 3", artist="Prem", file_path="prem3.mp3"),
+                Song(title="Yash Rhythm", artist="Yash", file_path="yash.mp3")
+            ]
+            db.add_all(initial_songs)
+            db.commit()
+            print("[INFO] Database successfully seeded with 11 initial tracks.")
+    except Exception as e:
+        print(f"[ERROR] Auto-seed failed: {e}")
+    finally:
+        db.close()
+
 @app.get("/health")
 def health_check():
     return {"status": "HEALTHY", "app": "Mast Maggan Multi-Track Engine"}
@@ -57,10 +87,10 @@ async def stream_audio(song_id: int, request: Request, db: Session = Depends(get
 
     filename = os.path.basename(song.file_path)
     potential_paths = [
+        f"/app/static/audio/{filename}",
         f"/tmp/audio/{filename}",
         os.path.join(PROJECT_ROOT, "static", "audio", filename),
         os.path.join(BASE_DIR, "static", "audio", filename),
-        f"/app/static/audio/{filename}",
         song.file_path
     ]
 
@@ -71,7 +101,7 @@ async def stream_audio(song_id: int, request: Request, db: Session = Depends(get
             break
 
     if not file_path:
-        raise HTTPException(status_code=404, detail="Audio file not found on disk")
+        raise HTTPException(status_code=404, detail=f"Audio file '{filename}' not found on disk")
 
     file_size = os.path.getsize(file_path)
     range_header = request.headers.get("range") or request.headers.get("Range")

@@ -1,0 +1,10 @@
+.git
+.gitignore
+*.tar
+*.tar.gz
+__pycache__
+*.pyc
+venv/
+app/venv/
+.scannerwork/
+image.tar

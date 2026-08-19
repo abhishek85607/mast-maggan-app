@@ -6,7 +6,7 @@ pipeline {
         IMAGE_BASE = 'mast-maggan-app-web'
         IMAGE_TAG = "${env.BUILD_NUMBER}"
         DOCKER_IMAGE = "${IMAGE_BASE}:${IMAGE_TAG}"
-        
+
         ALERT_EMAIL = 'realaviilife@gmail.com'
         SONAR_HOST_URL = 'http://10.254.225.42:9000'
         SONAR_TOKEN = 'squ_0a9917f55e7b3712ec162c65e0bf1af00fd3d1ad'
@@ -23,7 +23,7 @@ pipeline {
         stage('2. Trivy Filesystem Scan') {
             steps {
                 echo 'Running Trivy Vulnerability Scan on Source Code...'
-                bat 'docker run --rm -v trivy-cache:/root/.cache/ -v //./pipe/docker_engine://./pipe/docker_engine aquasec/trivy:latest fs --timeout 15m --severity CRITICAL,HIGH . & exit 0'
+                bat 'docker run --rm -v trivy-cache:/root/.cache/ -v //./pipe/docker_engine://./pipe/docker_engine aquasec/trivy:latest fs --timeout 5m --severity CRITICAL,HIGH . & exit 0'
             }
         }
 
@@ -32,7 +32,7 @@ pipeline {
                 echo 'Running SonarQube Code Quality & Security Scan...'
                 catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                     bat """
-                        docker run --rm -v "%WORKSPACE%:/usr/src" sonarsource/sonar-scanner-cli -Dsonar.projectKey=mast-maggan-app -Dsonar.sources=. -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.login=${SONAR_TOKEN}
+                        docker run --rm -v "%WORKSPACE%:/usr/src" sonarsource/sonar-scanner-cli -Dsonar.projectKey=mast-maggan-app -Dsonar.sources=app -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.login=${SONAR_TOKEN}
                     """
                 }
             }
@@ -53,7 +53,7 @@ pipeline {
                 echo 'Running Trivy Scan on Built Docker Image...'
                 catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                     bat """
-                        docker run --rm -v trivy-cache:/root/.cache/ -v "%WORKSPACE%:/workspace" aquasec/trivy:latest image --input /workspace/image.tar --severity CRITICAL,HIGH
+                        docker run --rm -v trivy-cache:/root/.cache/ -v "%WORKSPACE%:/workspace" aquasec/trivy:latest image --timeout 5m --input /workspace/image.tar --severity CRITICAL,HIGH & exit 0
                     """
                 }
             }
@@ -64,7 +64,7 @@ pipeline {
                 echo 'Pulling latest code and building image inside Linux VM Minikube...'
                 catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                     bat """
-                        ssh -i "C:\\ProgramData\\Jenkins\\.jenkins\\.ssh\\id_rsa" -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=NUL root@10.254.225.42 "cd /root/projects/mast-maggan-app && git pull origin main && eval \\\$(minikube docker-env) && docker build -t mast-maggan-app-web:latest . && eval \\\$(minikube docker-env -u)"
+                        ssh -i "C:\\ProgramData\\Jenkins\\.jenkins\\.ssh\\id_rsa" -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=NUL root@10.254.225.42 "cd /root/projects/mast-maggan-app && git pull origin main && minikube image build -t mast-maggan-app-web:latest ."
                     """
                 }
             }

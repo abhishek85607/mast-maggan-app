@@ -64,7 +64,7 @@ pipeline {
                 echo 'Pulling latest code and building image inside Linux VM Minikube...'
                 catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                     bat """
-                        ssh -i "C:\\Users\\abhis\\.ssh\\id_rsa" -o BatchMode=yes -o StrictHostKeyChecking=no root@10.254.225.42 "cd /root/projects/mast-maggan-app && git pull origin main && eval \\\$(minikube docker-env) && docker build -t mast-maggan-app-web:latest . && eval \\\$(minikube docker-env -u)"
+                        ssh -i "C:\\ProgramData\\Jenkins\\.jenkins\\.ssh\\id_rsa" -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=NUL root@10.254.225.42 "cd /root/projects/mast-maggan-app && git pull origin main && eval \\\$(minikube docker-env) && docker build -t mast-maggan-app-web:latest . && eval \\\$(minikube docker-env -u)"
                     """
                 }
             }
@@ -75,7 +75,7 @@ pipeline {
                 echo 'Applying K8s manifests and restarting deployment...'
                 catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                     bat """
-                        ssh -i "C:\\Users\\abhis\\.ssh\\id_rsa" -o BatchMode=yes -o StrictHostKeyChecking=no root@10.254.225.42 "kubectl apply -f /root/projects/mast-maggan-app/k8s/app-deployment.yaml && kubectl rollout restart deployment/mast-maggan-app && kubectl rollout status deployment/mast-maggan-app --timeout=60s"
+                        ssh -i "C:\\ProgramData\\Jenkins\\.jenkins\\.ssh\\id_rsa" -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=NUL root@10.254.225.42 "kubectl apply -f /root/projects/mast-maggan-app/k8s/app-deployment.yaml && kubectl rollout restart deployment/mast-maggan-app && kubectl rollout status deployment/mast-maggan-app --timeout=60s"
                     """
                 }
             }

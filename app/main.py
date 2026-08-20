@@ -58,16 +58,16 @@ def auto_seed_database():
                 Song(title="Ashish fav song1", artist="Ashish", file_path="ashish_fav1.mp3"),
                 Song(title="Ashish fav song2", artist="Ashish", file_path="ashish_fav2.mp3"),
                 Song(title="Ashish fav song3", artist="Ashish", file_path="ashish_fav3.mp3"),
-                Song(title="Chiki's fav song1", artist="Chiki", file_path="chiki_fav1.mp3"),
-                Song(title="Chiki's fav song2", artist="Chiki", file_path="chiki_fav2.mp3"),
-                Song(title="Chiki's fav song3", artist="Chiki", file_path="chiki_fav3.mp3"),
-                Song(title="Dinesh's fav song1", artist="Dinesh", file_path="dinesh_fav1.mp3"),
+                Song(title="Chiki fav song1", artist="Chiki", file_path="chiki_fav1.mp3"),
+                Song(title="Chiki fav song2", artist="Chiki", file_path="chiki_fav2.mp3"),
+                Song(title="Chiki fav song3", artist="Chiki", file_path="chiki_fav3.mp3"),
+                Song(title="Dinesh fav song1", artist="Dinesh", file_path="dinesh_fav1.mp3"),
                 Song(title="Kalyani song", artist="Kalyani", file_path="kalyani_fav.mp3"),
                 Song(title="Loli pop song", artist="Pawan Singh", file_path="lollipop_hit.mp3"),
-                Song(title="Prem's fav song1", artist="Prem", file_path="prem_fav1.mp3"),
-                Song(title="Prem's fav song2", artist="Prem", file_path="prem_fav2.mp3"),
-                Song(title="Prem's fav song3", artist="Prem", file_path="prem_fav3.mp3"),
-                Song(title="yash's fav song", artist="Yash", file_path="yash_fav.mp3")
+                Song(title="Prem fav song1", artist="Prem", file_path="prem_fav1.mp3"),
+                Song(title="Prem fav song2", artist="Prem", file_path="prem_fav2.mp3"),
+                Song(title="Prem fav song3", artist="Prem", file_path="prem_fav3.mp3"),
+                Song(title="yash fav song", artist="Yash", file_path="yash_fav.mp3")
             ]
             db.add_all(initial_songs)
             db.commit()

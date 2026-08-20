@@ -51,16 +51,16 @@ def auto_seed_database():
         if db.query(Song).count() == 0:
             initial_songs = [
                 Song(title="Abhishek Special Track", artist="Abhishek", file_path="abhishek.mp3"),
-                Song(title="Chiki Melody 1", artist="Chiki", file_path="chiki1.mp3"),
-                Song(title="Chiki Melody 2", artist="Chiki", file_path="chiki2.mp3"),
-                Song(title="Chiki Melody 3", artist="Chiki", file_path="chiki3.mp3"),
-                Song(title="Dinesh Grooves", artist="Dinesh", file_path="dinesh.mp3"),
-                Song(title="Kalyani Beats", artist="Kalyani", file_path="kalyani.mp3"),
+                Song(title="Chiki fav1", artist="Chiki", file_path="chiki1.mp3"),
+                Song(title="Chiki fav2", artist="Chiki", file_path="chiki2.mp3"),
+                Song(title="Chiki fav3", artist="Chiki", file_path="chiki3.mp3"),
+                Song(title="Dinesh fav1", artist="Dinesh", file_path="dinesh.mp3"),
+                Song(title="Kalyani ", artist="Kalyani", file_path="kalyani.mp3"),
                 Song(title="Lollipop Hit", artist="Pawan Singh", file_path="lollipop.mp3"),
-                Song(title="Prem Sagar Track 1", artist="Prem", file_path="prem1.mp3"),
-                Song(title="Prem Sagar Track 2", artist="Prem", file_path="prem2.mp3"),
-                Song(title="Prem Sagar Track 3", artist="Prem", file_path="prem3.mp3"),
-                Song(title="Yash Rhythm", artist="Yash", file_path="yash.mp3")
+                Song(title="Prem fav1", artist="Prem", file_path="prem1.mp3"),
+                Song(title="Prem fav2", artist="Prem", file_path="prem2.mp3"),
+                Song(title="Prem fav3", artist="Prem", file_path="prem3.mp3"),
+                Song(title="Yash fav1", artist="Yash", file_path="yash.mp3")
             ]
             db.add_all(initial_songs)
             db.commit()
@@ -143,4 +143,4 @@ async def stream_audio(song_id: int, request: Request, db: Session = Depends(get
         "Content-Length": str(file_size),
         "Content-Type": "audio/mpeg",
     }
-    return StreamingResponse(iterfull(), status_code=200, headers=headers)
+    return StreamingResponse(iterfull(), status_code=200, headers=headersi)

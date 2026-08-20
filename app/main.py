@@ -45,26 +45,33 @@ def get_db():
 # --- AUTO-SEED LOGIC ---
 @app.on_event("startup")
 def auto_seed_database():
-    """Server boot hote hi agar DB empty hai to saare 11 tracks add kar dega"""
+    """Server boot hote hi agar DB empty hai to saare 18 tracks add kar dega"""
     db = SessionLocal()
     try:
         if db.query(Song).count() == 0:
             initial_songs = [
-                Song(title="Abhishek Special Track", artist="Abhishek", file_path="abhishek.mp3"),
-                Song(title="Chiki fav1", artist="Chiki", file_path="chiki1.mp3"),
-                Song(title="Chiki fav2", artist="Chiki", file_path="chiki2.mp3"),
-                Song(title="Chiki fav3", artist="Chiki", file_path="chiki3.mp3"),
-                Song(title="Dinesh fav1", artist="Dinesh", file_path="dinesh.mp3"),
-                Song(title="Kalyani ", artist="Kalyani", file_path="kalyani.mp3"),
-                Song(title="Lollipop Hit", artist="Pawan Singh", file_path="lollipop.mp3"),
-                Song(title="Prem fav1", artist="Prem", file_path="prem1.mp3"),
-                Song(title="Prem fav2", artist="Prem", file_path="prem2.mp3"),
-                Song(title="Prem fav3", artist="Prem", file_path="prem3.mp3"),
-                Song(title="Yash fav1", artist="Yash", file_path="yash.mp3")
+                Song(title="Abhishek Special Track", artist="Abhishek", file_path="abhishek_special.mp3"),
+                Song(title="Abhishek Fav Song", artist="Abhishek", file_path="abhishek_fav.mp3"),
+                Song(title="Anshu fav song1", artist="Anshu", file_path="anshu_fav1.mp3"),
+                Song(title="Anshu fav song2", artist="Anshu", file_path="anshu_fav2.mp3"),
+                Song(title="Anshu fav song3", artist="Anshu", file_path="anshu_fav3.mp3"),
+                Song(title="Ashish fav song1", artist="Ashish", file_path="ashish_fav1.mp3"),
+                Song(title="Ashish fav song2", artist="Ashish", file_path="ashish_fav2.mp3"),
+                Song(title="Ashish fav song3", artist="Ashish", file_path="ashish_fav3.mp3"),
+                Song(title="Chiki's fav song1", artist="Chiki", file_path="chiki_fav1.mp3"),
+                Song(title="Chiki's fav song2", artist="Chiki", file_path="chiki_fav2.mp3"),
+                Song(title="Chiki's fav song3", artist="Chiki", file_path="chiki_fav3.mp3"),
+                Song(title="Dinesh's fav song1", artist="Dinesh", file_path="dinesh_fav1.mp3"),
+                Song(title="Kalyani song", artist="Kalyani", file_path="kalyani_fav.mp3"),
+                Song(title="Loli pop song", artist="Pawan Singh", file_path="lollipop_hit.mp3"),
+                Song(title="Prem's fav song1", artist="Prem", file_path="prem_fav1.mp3"),
+                Song(title="Prem's fav song2", artist="Prem", file_path="prem_fav2.mp3"),
+                Song(title="Prem's fav song3", artist="Prem", file_path="prem_fav3.mp3"),
+                Song(title="yash's fav song", artist="Yash", file_path="yash_fav.mp3")
             ]
             db.add_all(initial_songs)
             db.commit()
-            print("[INFO] Database successfully seeded with 11 initial tracks.")
+            print("[INFO] Database successfully seeded with 18 tracks.")
     except Exception as e:
         print(f"[ERROR] Auto-seed failed: {e}")
     finally:
@@ -143,4 +150,4 @@ async def stream_audio(song_id: int, request: Request, db: Session = Depends(get
         "Content-Length": str(file_size),
         "Content-Type": "audio/mpeg",
     }
-    return StreamingResponse(iterfull(), status_code=200, headers=headersi)
+    return StreamingResponse(iterfull(), status_code=200, headers=headers)
